@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milk Website</title>
+<style>
+/* Global styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+h1 {
+  color: #333;
+}
+
+.day-btn {
+  margin: 5px;
+  padding: 15px 25px;
+  background-color: #ccc;
+  border: none;
+  cursor: pointer;
+}
+
+.day-btn.green {
+  background-color: green;
+  color: white;
+}
+
+.day-btn.red {
+  background-color: red;
+  color: white;
+}
+
+input[type="number"] {
+  width: 100px;
+  margin: 10px;
+}
+
+#price {
+  margin-top: 20px;
+}
+
+#milk-bought {
+  margin-top: 20px;
+}
+
+#refresh-btn {
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background-color: #ffcc00;
+  border: none;
+  cursor: pointer;
+}
+
+#done-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px 20px;
+  background-color: #ffcc00;
+  border: none;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>BUFFALO MILK</h1>
+  <button id="done-btn">Done</button>
+  <div id="days">
+    <button class="day-btn" data-day="1">01</button>
+    <button class="day-btn" data-day="2">02</button>
+    <button class="day-btn" data-day="3">03</button>
+    <button class="day-btn" data-day="4">04</button>
+    <button class="day-btn" data-day="5">05</button>
+    <button class="day-btn" data-day="6">06</button>
+    <button class="day-btn" data-day="7">07</button>
+    <button class="day-btn" data-day="8">08</button>
+    <button class="day-btn" data-day="9">09</button>
+    <button class="day-btn" data-day="10">10</button>
+    <button class="day-btn" data-day="11">11</button>
+    <button class="day-btn" data-day="12">12</button>
+    <button class="day-btn" data-day="13">13</button>
+    <button class="day-btn" data-day="14">14</button>
+    <button class="day-btn" data-day="15">15</button>
+    <button class="day-btn" data-day="16">16</button>
+    <button class="day-btn" data-day="17">17</button>
+    <button class="day-btn" data-day="18">18</button>
+    <button class="day-btn" data-day="19">19</button>
+    <button class="day-btn" data-day="20">20</button>
+    <button class="day-btn" data-day="21">21</button>
+    <button class="day-btn" data-day="22">22</button>
+    <button class="day-btn" data-day="23">23</button>
+    <button class="day-btn" data-day="24">24</button>
+    <button class="day-btn" data-day="25">25</button>
+    <button class="day-btn" data-day="26">26</button>
+    <button class="day-btn" data-day="27">27</button>
+    <button class="day-btn" data-day="28">28</button>
+    <button class="day-btn" data-day="29">29</button>
+    <button class="day-btn" data-day="30">30</button>
+    <button class="day-btn" data-day="31">31</button>
+  </div>
+
+  <div id="milk-bought"></div>
+
+  <button id="refresh-btn">Refresh</button>
+</div>
+
+<audio id="done-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+<!-- Include jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  const dayButtons = $('.day-btn');
+
+  dayButtons.each(function() {
+    const day = $(this).data('day');
+    const status = localStorage.getItem(`day-${day}-status`);
+    if (status === 'green') {
+      $(this).addClass('green');
+    } else if (status === 'red') {
+      $(this).addClass('red');
+    }
+
+    $(this).click(function() {
+      const status = confirm(`Do you want milk on day ${day}?`);
+
+      if (status) {
+        $(this).removeClass('red').addClass('green');
+        console.log(`Milk confirmed for day ${day}`);
+        localStorage.setItem(`day-${day}-status`, 'green');
+        const quantity = prompt(`How many grams of milk do you want on day ${day}?`);
+        if (quantity) {
+          let milkCount = localStorage.getItem(`day-${day}-count`);
+          milkCount = milkCount ? parseFloat(milkCount) + parseFloat(quantity) : parseFloat(quantity);
+          localStorage.setItem(`day-${day}-count`, milkCount);
+        }
+      } else {
+        $(this).removeClass('green').addClass('red');
+        console.log(`No milk for day ${day}`);
+        localStorage.setItem(`day-${day}-status`, 'red');
+      }
+    });
+  });
+
+  // Calculate total cost for the month
+  let totalCost = 0;
+  for (let day = 1; day <= 31; day++) {
+    const count = localStorage.getItem(`day-${day}-count`);
+    if (count) {
+      totalCost += parseFloat(count) * 0.05; // Assuming price is $0.04 per gram
+    }
+  }
+  const totalMessage = `Total cost for the month:- Rs: ${totalCost.toFixed(0)}`;
+  $('#milk-bought').html(`<p>${totalMessage}</p>`);
+
+  // Add event listener for refresh button
+  $('#refresh-btn').click(function() {
+    const confirmed = confirm("Are you sure you want to refresh? This will clear all selections.");
+    if (confirmed) {
+      localStorage.clear();
+      location.reload();
+    }
+  });
+
+  // Add event listener for done button
+  $('#done-btn').click(function() {
+    document.getElementById('done-sound').play(); // Play the sound
+    location.reload();
+  });
+});
+</script>
+</body>
+</html>
